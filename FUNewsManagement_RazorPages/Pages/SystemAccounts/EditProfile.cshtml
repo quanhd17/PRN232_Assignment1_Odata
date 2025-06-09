@@ -1,0 +1,79 @@
+﻿@page
+@model FUNewsManagement_RazorPages.Pages.SystemAccounts.EditProfileModel
+
+@{
+    ViewData["Title"] = "Edit Profile";
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-header bg-primary text-white text-center rounded-top-4">
+                    <h3 class="fw-bold">👤 Edit Profile</h3>
+                </div>
+                <div class="card-body p-4">
+
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            🎉 @TempData["SuccessMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            ⚡ @TempData["ErrorMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <form asp-action="EditProfile">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <input type="hidden" asp-for="SystemAccount.AccountId" />
+
+                        <div class="form-group mb-3">
+                            <label asp-for="SystemAccount.AccountName" class="form-label fw-semibold">📝 Full Name</label>
+                            <input asp-for="SystemAccount.AccountName" class="form-control shadow-sm" placeholder="Enter your full name" required />
+                            <span asp-validation-for="SystemAccount.AccountName" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="SystemAccount.AccountEmail" class="form-label fw-semibold">📧 Email Address</label>
+                            <input asp-for="SystemAccount.AccountEmail" class="form-control shadow-sm" readonly />
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label asp-for="SystemAccount.AccountRole" class="form-label fw-semibold">👑 Role</label>
+                            <input asp-for="SystemAccount.AccountRole" class="form-control shadow-sm" readonly />
+                        </div>
+
+                        <h5 class="fw-bold text-primary mb-3">🔒 Change Password</h5>
+                        <div class="form-group mb-3">
+                            <label for="OldPassword" class="form-label fw-semibold">🔑 Old Password</label>
+                            <input type="password" name="OldPassword" class="form-control shadow-sm" placeholder="Enter old password" required />
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label for="NewPassword" class="form-label fw-semibold">✨ New Password</label>
+                            <input type="password" name="NewPassword" class="form-control shadow-sm" placeholder="Enter new password" required />
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <button type="submit" class="btn btn-primary px-4 shadow-sm">💾 Save Changes</button>
+                            <a asp-action="Index" class="btn btn-secondary px-4 shadow-sm">❌ Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

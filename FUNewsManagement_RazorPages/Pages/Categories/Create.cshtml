@@ -1,0 +1,55 @@
+﻿@page
+@model FUNewsManagement_RazorPages.Pages.Categories.CreateModel
+@{
+    ViewData["Title"] = "Create Category";
+}
+
+<div class="container mt-4">
+    <h3 class="text-primary"><i class="bi bi-folder-plus"></i> Create Category</h3>
+
+    <div class="card shadow-sm border-0 mt-3">
+        <div class="card-body">
+            <form method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="mb-2">
+                    <label asp-for="Category.CategoryName" class="form-label">Category Name</label>
+                    <input asp-for="Category.CategoryName" class="form-control" required />
+                    <span asp-validation-for="Category.CategoryName" class="text-danger"></span>
+                </div>
+
+                <div class="mb-2">
+                    <label asp-for="Category.CategoryDesciption" class="form-label">Description</label>
+                    <textarea asp-for="Category.CategoryDesciption" class="form-control" rows="2" required></textarea>
+                    <span asp-validation-for="Category.CategoryDesciption" class="text-danger"></span>
+                </div>
+
+                <div class="mb-2">
+                    <label asp-for="Category.ParentCategoryId" class="form-label">Parent Category</label>
+                    <select asp-for="Category.ParentCategoryId" class="form-select" asp-items="ViewBag.ParentCategoryId">
+                        <option value="">-- Select --</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Category.IsActive" class="form-label">Status</label>
+                    <select asp-for="Category.IsActive" class="form-select">
+                        <option value="true">Active</option>
+                        <option value="false">Inactive</option>
+                    </select>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <a asp-page="Index" class="btn btn-outline-secondary">Back</a>
+                    <button type="submit" class="btn btn-primary">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

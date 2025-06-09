@@ -1,0 +1,6 @@
+@Assignment1_NgoDongquan_HostAddress = http://localhost:5225
+
+GET {{Assignment1_NgoDongquan_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

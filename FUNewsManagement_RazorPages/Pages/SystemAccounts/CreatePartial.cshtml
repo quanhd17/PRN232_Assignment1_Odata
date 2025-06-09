@@ -1,0 +1,37 @@
+﻿@page
+@model FUNewsManagement_RazorPages.Pages.SystemAccounts.CreatePartialModel
+
+@{
+    Layout = null;
+}
+<form id="createAccountForm" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="SystemAccount.AccountName" class="form-label"> Account Name</label>
+        <input asp-for="SystemAccount.AccountName" class="form-control" required />
+        <span asp-validation-for="SystemAccount.AccountName" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="SystemAccount.AccountEmail" class="form-label"> Account Email</label>
+        <input asp-for="SystemAccount.AccountEmail" class="form-control" required />
+        <span asp-validation-for="SystemAccount.AccountEmail" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="SystemAccount.AccountRole" class="form-label"> Account Role</label>
+        <select asp-for="SystemAccount.AccountRole" class="form-select" required>
+            <option value="1"> Staff</option>
+            <option value="2"> Lecturer</option>
+        </select>
+        <span asp-validation-for="SystemAccount.AccountRole" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="SystemAccount.AccountPassword" class="form-label"> Password</label>
+        <input asp-for="SystemAccount.AccountPassword" type="password" class="form-control" required />
+        <span asp-validation-for="SystemAccount.AccountPassword" class="text-danger"></span>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"> Cancel</button>
+        <button type="submit" class="btn btn-primary"> Create</button>
+    </div>
+</form>

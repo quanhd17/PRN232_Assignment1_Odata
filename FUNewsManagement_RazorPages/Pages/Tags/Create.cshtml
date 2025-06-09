@@ -1,0 +1,49 @@
+﻿@page
+@model FUNewsManagement_RazorPages.Pages.Tags.CreateModel
+@{
+    ViewData["Title"] = "Create Tag";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white text-center">
+                    <h3 class="mb-0">➕ Create New Tag</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+
+                        <div class="mb-3">
+                            <label asp-for="Tag.TagName" class="form-label fw-bold">Tag Name</label>
+                            <input asp-for="Tag.TagName" class="form-control" />
+                            <span asp-validation-for="Tag.TagName" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Tag.Note" class="form-label fw-bold">Note</label>
+                            <input asp-for="Tag.Note" class="form-control" />
+                            <span asp-validation-for="Tag.Note" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">💾 Create</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="text-center mt-3">
+                <a asp-page="/Tags/Index" class="btn btn-outline-secondary">⬅️ Back to List</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -1,0 +1,94 @@
+﻿@page
+@model FUNewsManagement_RazorPages.Pages.NewsArticles.DetailsModel
+
+@{
+    ViewData["Title"] = "News Article Details";
+}
+
+<div class="container mt-4">
+    <h1 class="text-center">News Article Details</h1>
+
+
+    <div class="card">
+        <div class="card-body">
+
+
+            <table class="table table-bordered table-striped">
+                <tbody>
+                    <tr>
+                        <th class="col-sm-2">@Html.DisplayNameFor(model => model.NewsArticle.NewsArticleId)</th>
+                        <td>@Html.DisplayFor(model => model.NewsArticle.NewsArticleId)</td>
+                    </tr>
+                    <tr>
+                        <th>@Html.DisplayNameFor(model => model.NewsArticle.NewsTitle)</th>
+                        <td>@Html.DisplayFor(model => model.NewsArticle.NewsTitle)</td>
+                    </tr>
+                    <tr>
+                        <th>@Html.DisplayNameFor(model => model.NewsArticle.Headline)</th>
+                        <td>@Html.DisplayFor(model => model.NewsArticle.Headline)</td>
+                    </tr>
+                    <tr>
+                        <th>@Html.DisplayNameFor(model => model.NewsArticle.CreatedDate)</th>
+                        <td>@Html.DisplayFor(model => model.NewsArticle.CreatedDate)</td>
+                    </tr>
+                    <tr>
+                        <th>@Html.DisplayNameFor(model => model.NewsArticle.NewsContent)</th>
+                        <td>@Html.DisplayFor(model => model.NewsArticle.NewsContent)</td>
+                    </tr>
+                    <tr>
+                        <th>@Html.DisplayNameFor(model => model.NewsArticle.NewsSource)</th>
+                        <td>@Html.DisplayFor(model => model.NewsArticle.NewsSource)</td>
+                    </tr>
+                    <tr>
+                        <
+                        <th>@Html.DisplayNameFor(model => model.NewsArticle.NewsStatus)</th>
+                        <td>
+                            @(Model.NewsArticle.NewsStatus.GetValueOrDefault() ? "Active" : "Inactive")
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>@Html.DisplayNameFor(model => model.NewsArticle.UpdatedById)</th>
+                        <td>@Html.DisplayFor(model => model.NewsArticle.UpdatedById)</td>
+                    </tr>
+                    <tr>
+                        <th>@Html.DisplayNameFor(model => model.NewsArticle.ModifiedDate)</th>
+                        <td>@Html.DisplayFor(model => model.NewsArticle.ModifiedDate)</td>
+                    </tr>
+                    <tr>
+                        <th>@Html.DisplayNameFor(model => model.NewsArticle.Category.CategoryName)</th>
+                        <td>@Html.DisplayFor(model => model.NewsArticle.Category.CategoryName)</td>
+                    </tr>
+                    <tr>
+                        <th>@Html.DisplayNameFor(model => model.NewsArticle.CreatedBy)</th>
+                        <td>@Html.DisplayFor(model => model.NewsArticle.CreatedBy.AccountName)</td>
+                    </tr>
+                    <tr>
+                        <th>Tags</th>
+                        <td>
+                            @if (Model.NewsArticle.Tags != null && Model.NewsArticle.Tags.Any())
+                            {
+                                <ul class="list-inline">
+                                    @foreach (var tag in Model.NewsArticle.Tags)
+                                    {
+                                        <li class="list-inline-item badge bg-secondary">@tag.TagName</li>
+                                    }
+                                </ul>
+                            }
+                            else
+                            {
+                                <p class="text-muted">No tags available.</p>
+                            }
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="mt-4 text-center">
+
+        <a class="btn btn-secondary" asp-page="/NewsArticles/Index">Back to List</a>
+    </div>
+</div>

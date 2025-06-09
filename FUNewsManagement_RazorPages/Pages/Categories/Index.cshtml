@@ -1,0 +1,140 @@
+﻿@page
+@model FUNewsManagement_RazorPages.Pages.Categories.IndexModel
+@{
+    ViewData["Title"] = "Category Management";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>@ViewData["Title"]</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container py-5">
+        <div id="errorMessage" class="alert alert-danger d-none"></div>
+        <h1 class="fw-bold text-primary mb-4">@ViewData["Title"]</h1>
+
+
+        <!-- Nút tạo mới -->
+        <div class="mb-3">
+            <a asp-page="/Categories/Create" class="btn btn-success shadow-sm">➕ Create New Category</a>
+
+        </div>
+
+        <!-- Bảng danh sách Category -->
+        <div class="table-responsive shadow-sm rounded bg-white px-3 py-3">
+            <table class="table table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>#️⃣ No.</th>
+                        <th>📛 Name</th>
+                        <th style="width: 30%;">📝 Description</th> <!-- Thu nhỏ cột Description -->
+                        <th>✅ Active</th>
+                        <th class="text-center">⚡ Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        var index = 1;
+                    }
+                    @foreach (var category in Model.Category)
+                    {
+                        <tr>
+                            <td>@index</td>
+                            <td>@category.CategoryName</td>
+                            <td>
+                                <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 250px;">
+                                    @category.CategoryDesciption
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge bg-@(category.IsActive.GetValueOrDefault() ? "success" : "danger")">
+                                    @(category.IsActive.GetValueOrDefault() ? "Active" : "Inactive")
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <div class="d-flex justify-content-center gap-2">
+                                    <a asp-page="./Details" asp-route-id="@category.CategoryId"
+                                       class="btn btn-sm btn-outline-primary">👁️ Details</a>
+                                    <a asp-page="./Edit" asp-route-id="@category.CategoryId" class="btn btn-sm btn-warning ">✏️ Edit</a>
+                                    <a href="javascript:void(0);" class="btn btn-sm btn-danger delete-category-btn"
+                                       data-id="@category.CategoryId" data-name="@category.CategoryName">🗑️ Delete</a>
+                                </div>
+                            </td>
+                        </tr>
+                        index++;
+                    }
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+
+
+    <!-- Modal Delete -->
+    <div class="modal fade" id="deleteCategoryModal" tabindex="-1" aria-labelledby="deleteCategoryLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="deleteCategoryLabel">🗑️ Confirm Delete</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="deleteCategoryContent">
+                    @Html.AntiForgeryToken()
+                    <p>⚠️ Are you sure you want to delete <strong id="deleteCategoryName"></strong>?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">❌ Cancel</button>
+                    <button type="button" id="confirmDeleteCategoryBtn" class="btn btn-danger">🗑️ Confirm Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+
+
+        // Delete Category
+        let deleteCategoryId;
+        document.addEventListener('click', function (e) {
+            if (e.target && e.target.classList.contains('delete-category-btn')) {
+                deleteCategoryId = e.target.getAttribute('data-id');
+                const categoryName = e.target.getAttribute('data-name');
+                document.getElementById('deleteCategoryName').textContent = categoryName;
+                new bootstrap.Modal(document.getElementById('deleteCategoryModal')).show();
+            }
+        });
+                document.getElementById('confirmDeleteCategoryBtn').addEventListener('click', function () {
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+            const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteCategoryModal')); // Lấy instance modal
+
+            fetch(`/Categories/Delete?id=${deleteCategoryId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `__RequestVerificationToken=${token}`
+            })
+            .then(async response => {
+                if (response.redirected) {
+                    window.location.href = response.url;
+                } else if (!response.ok) {
+                    // Đọc nội dung lỗi từ API
+                    const errorText = await response.text();
+                    // Hiển thị thông báo lỗi (có thể tuỳ chỉnh UI)
+                    alert(errorText || '❌ Xóa thất bại.');
+                } else {
+                    alert('❌ Xóa thất bại.');
+                }
+            })
+            .catch(error => console.error('⚡ Fetch error:', error));
+        });
+
+
+
+    </script>
+</body>
+</html>

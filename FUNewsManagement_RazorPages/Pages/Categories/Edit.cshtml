@@ -1,0 +1,57 @@
+﻿@page
+@model FUNewsManagement_RazorPages.Pages.Categories.EditModel
+@{
+    ViewData["Title"] = "Edit Category";
+}
+
+<div class="container d-flex justify-content-center mt-4">
+    <div class="card shadow-sm border-0" style="width: 50%;">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-pencil-square"></i> Edit Category</h5>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="Category.CategoryId" />
+
+                <div class="mb-3">
+                    <label asp-for="Category.CategoryName" class="form-label">Category Name</label>
+                    <input asp-for="Category.CategoryName" class="form-control" required />
+                    <span asp-validation-for="Category.CategoryName" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Category.CategoryDesciption" class="form-label">Description</label>
+                    <textarea asp-for="Category.CategoryDesciption" class="form-control" rows="2" required></textarea>
+                    <span asp-validation-for="Category.CategoryDesciption" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Category.ParentCategoryId" class="form-label">Parent Category</label>
+                    <select asp-for="Category.ParentCategoryId" class="form-select" asp-items="ViewBag.ParentCategoryId">
+                        <option value="">-- Select --</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Category.IsActive" class="form-label">Status</label>
+                    <select asp-for="Category.IsActive" class="form-select">
+                        <option value="true">Active</option>
+                        <option value="false">Inactive</option>
+                    </select>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <a asp-page="./Index" class="btn btn-outline-secondary">Back</a>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

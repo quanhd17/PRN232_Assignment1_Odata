@@ -1,0 +1,49 @@
+﻿@page
+@model FUNewsManagement_RazorPages.Pages.SystemAccounts.DetailsModel
+
+@{
+    ViewData["Title"] = "Account Details";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container py-5">
+        <div class="card shadow-lg border-0 rounded-4">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h3 class="mb-0">👤 Account Details</h3>
+                <a asp-page="/SystemAccounts/Index" class="btn btn-light btn-sm">🔙 Back to List</a>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-3"> ID</dt>
+                    <dd class="col-sm-9 fw-semibold">@Html.DisplayFor(model => model.SystemAccount.AccountId)</dd>
+                    <dt class="col-sm-3">👤 Name</dt>
+                    <dd class="col-sm-9 fw-semibold">@Html.DisplayFor(model => model.SystemAccount.AccountName)</dd>
+
+                    <dt class="col-sm-3">📧 Email</dt>
+                    <dd class="col-sm-9 fw-semibold">@Html.DisplayFor(model => model.SystemAccount.AccountEmail)</dd>
+
+                    <dt class="col-sm-3">🛡️ Role</dt>
+                    <dd class="col-sm-9">
+                        <span class="badge bg-@(Model.SystemAccount.AccountRole == 1 ? "primary" : "secondary") fs-6">
+                            @(Model.SystemAccount.AccountRole == 1 ? "Staff" : "Lecturer")
+                        </span>
+                    </dd>
+
+                    <dt class="col-sm-3">🔒 Password</dt>
+                    <dd class="col-sm-9 text-muted"> ********</dd>
+                </dl>
+            </div>
+
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
