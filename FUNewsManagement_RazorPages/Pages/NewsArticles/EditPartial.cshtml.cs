@@ -27,7 +27,7 @@ namespace FUNewsManagement_RazorPages.Pages.NewsArticles
 
         public async Task<IActionResult> OnGetAsync(string id)
         {
-            NewsArticle = await _httpClient.GetFromJsonAsync<NewsArticle>($"https://localhost:7130/odata/NewsArticle({id})");
+            NewsArticle = await _httpClient.GetFromJsonAsync<NewsArticle>($"https://localhost:7130/odata/NewsArticles({id})");
 
             if (NewsArticle == null)
             {
@@ -74,7 +74,7 @@ namespace FUNewsManagement_RazorPages.Pages.NewsArticles
                 NewsArticle = NewsArticle,
                 TagIds = SelectedTagIds
             };
-            await _httpClient.PutAsJsonAsync($"https://localhost:7130/odata/NewsArticle({id})", model);
+            await _httpClient.PutAsJsonAsync($"https://localhost:7130/odata/NewsArticles({id})", model);
 
             return RedirectToPage("/NewsArticles/Index");
         }

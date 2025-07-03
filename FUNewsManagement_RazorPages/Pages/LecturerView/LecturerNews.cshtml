@@ -1,0 +1,269 @@
+﻿@page
+@model LecturerNewsModel
+@{
+    ViewData["Title"] = "LecturerNews";
+}
+
+
+@* ...existing code... *@
+
+<div class="bg-primary text-white rounded-3 p-4 mb-4 shadow">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+        <h1 class="display-4 mb-0">FPT University News</h1>
+                <p class="lead mb-0">Latest updates and stories for lecturers</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <div class="dropdown">
+                    <button class="btn btn-light dropdown-toggle" type="button" id="categoryDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-filter me-2"></i>
+                        Filter by Category
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" id="categoryTree" aria-labelledby="categoryDropdown">
+                        <li><a class="dropdown-item category-item" href="#" data-category-id="all">All Categories</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        @if (Model.Categories.Any())
+                        {
+                            var parentCategories = Model.Categories.Where(c => !c.ParentCategoryId.HasValue).ToList();
+                            var childCategories = Model.Categories.Where(c => c.ParentCategoryId.HasValue).ToList();
+                            
+                            @foreach (var parent in parentCategories)
+                            {
+                                <li>
+                                    <a class="dropdown-item category-item" href="#" data-category-id="@parent.CategoryId">
+                                        <i class="fas fa-folder me-2 text-warning"></i>
+                                        @parent.CategoryName
+                                    </a>
+                                    @{
+                                        var subcategories = childCategories.Where(c => c.ParentCategoryId == parent.CategoryId).ToList();
+                                    }
+                                    @if (subcategories.Any())
+                                    {
+                                        <ul class="list-unstyled subcategory">
+                                            @foreach (var sub in subcategories)
+                                            {
+                                                <li>
+                                                    <a class="dropdown-item category-item subcategory-item" href="#" data-category-id="@sub.CategoryId">
+                                                        <i class="fas fa-folder-open me-2 text-info"></i>
+                                                        @sub.CategoryName
+                                                    </a>
+                                                </li>
+                                            }
+                                        </ul>
+                                    }
+                                </li>
+                            }
+                        }
+                        else
+                        {
+                            <li><span class="dropdown-item-text text-muted">No categories available</span></li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    @foreach (var item in Model.NewsArticles)
+    {
+        <div class="col">
+            <div class="card shadow-sm h-100">
+                
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title fw-bold mb-2">
+                        <a asp-page="LecturerNewDetails" asp-route-id="@item.NewsArticleId" class="stretched-link text-decoration-none text-dark">
+                            @item.NewsTitle
+                        </a>
+                    </h5>
+                    <h6 class="card-subtitle mb-2 text-muted">@item.Headline</h6>
+                    <p class="card-text flex-grow-1">
+                        @(string.IsNullOrEmpty(item.NewsContent) ? "" : item.NewsContent.Substring(0, Math.Min(150, item.NewsContent.Length)) + "...")
+                    </p>
+                    <a asp-page="LecturerNewDetails" asp-route-id="@item.NewsArticleId" class="btn btn-outline-primary btn-sm mt-auto align-self-start">Read more</a>
+                </div>
+                <div class="card-footer text-muted text-end">
+                    Update: @item.ModifiedDate?.ToString("dd/MM/yyyy")
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<footer class="bg-white border-top mt-5 py-3 text-center text-muted">
+    &copy; @DateTime.Now.Year FPT University News Portal
+</footer>
+
+<style>
+    .card:hover {
+        transform: translateY(-5px) scale(1.02);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        transition: 0.2s;
+    }
+
+    .card-img-top {
+        object-fit: cover;
+        height: 180px;
+    }
+    
+    .category-item {
+        padding: 0.5rem 1rem;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+    
+    .category-item:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .category-item.active {
+        background-color: #e9ecef;
+        font-weight: 600;
+    }
+    
+    .subcategory {
+        padding-left: 1.5rem;
+        border-left: 2px solid #dee2e6;
+        margin-left: 0.5rem;
+    }
+    
+    .subcategory .category-item {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.9rem;
+    }
+    
+    .subcategory-item {
+        padding-left: 2rem !important;
+    }
+</style>
+
+<script>
+    let currentCategoryId = 'all';
+    let allNewsArticles = [];
+
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        loadNewsArticles();
+        setupCategoryFilter();
+    });
+
+    // Load news articles
+    async function loadNewsArticles() {
+        try {
+            const response = await fetch('https://localhost:7130/odata/NewsArticles');
+            const data = await response.json();
+            
+            allNewsArticles = data.value || [];
+            displayNewsArticles(allNewsArticles);
+        } catch (error) {
+            console.error('Error loading news articles:', error);
+        }
+    }
+
+    // Filter news by category
+    function filterByCategory(categoryId, categoryName) {
+        currentCategoryId = categoryId;
+        
+        // Update dropdown button text
+        const dropdownButton = document.getElementById('categoryDropdown');
+        dropdownButton.innerHTML = `<i class="fas fa-filter me-2"></i>${categoryName}`;
+        
+        // Update active state in dropdown
+        document.querySelectorAll('.category-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        
+        const activeItem = document.querySelector(`[data-category-id="${categoryId}"]`);
+        if (activeItem) {
+            activeItem.classList.add('active');
+        }
+        
+        // Filter articles
+        let filteredArticles = allNewsArticles;
+        if (categoryId !== 'all') {
+            filteredArticles = allNewsArticles.filter(article => 
+                article.categoryId === categoryId || 
+                article.category?.categoryId === categoryId
+            );
+        }
+        
+        displayNewsArticles(filteredArticles);
+    }
+
+    // Display news articles
+    function displayNewsArticles(articles) {
+        const container = document.querySelector('.row.row-cols-1.row-cols-md-2.row-cols-lg-3');
+        
+        if (articles.length === 0) {
+            container.innerHTML = `
+                <div class="col-12 text-center py-5">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        No news articles found for the selected category.
+                    </div>
+                </div>
+            `;
+            return;
+        }
+        
+        let html = '';
+        articles.forEach(article => {
+            const title = article.newsTitle || article.NewsTitle || 'Untitled';
+            const headline = article.headline || article.Headline || '';
+            const content = article.newsContent || article.NewsContent || '';
+            const modifiedDate = article.modifiedDate || article.ModifiedDate;
+            const articleId = article.newsArticleId || article.NewsArticleId;
+            
+            const truncatedContent = content.length > 150 ? content.substring(0, 150) + '...' : content;
+            const dateString = modifiedDate ? new Date(modifiedDate).toLocaleDateString('en-GB') : 'N/A';
+            
+            html += `
+                <div class="col">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title fw-bold mb-2">
+                                <a href="/LecturerView/LecturerNewDetails?id=${articleId}" class="stretched-link text-decoration-none text-dark">
+                                    ${title}
+                                </a>
+                            </h5>
+                            <h6 class="card-subtitle mb-2 text-muted">${headline}</h6>
+                            <p class="card-text flex-grow-1">
+                                ${truncatedContent}
+                            </p>
+                            <a href="/LecturerView/LecturerNewDetails?id=${articleId}" class="btn btn-outline-primary btn-sm mt-auto align-self-start">Read more</a>
+                        </div>
+                        <div class="card-footer text-muted text-end">
+                            Update: ${dateString}
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        container.innerHTML = html;
+    }
+
+    // Setup category filter for all category items
+    function setupCategoryFilter() {
+        // Setup "All Categories"
+        const allCategoriesItem = document.querySelector('[data-category-id="all"]');
+        if (allCategoriesItem) {
+            allCategoriesItem.addEventListener('click', function(e) {
+                e.preventDefault();
+                filterByCategory('all', 'All Categories');
+            });
+        }
+        
+        // Setup all category items
+        document.querySelectorAll('.category-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                const categoryId = this.getAttribute('data-category-id');
+                const categoryName = this.textContent.trim();
+                filterByCategory(categoryId, categoryName);
+            });
+        });
+    }
+</script>

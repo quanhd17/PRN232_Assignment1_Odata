@@ -1,7 +1,6 @@
 ﻿@page
 @model FUNewsManagement_RazorPages.Pages.NewsArticles.IndexModel
 
-
 @{
     ViewData["Title"] = "News Management";
 }
@@ -12,34 +11,54 @@
     <meta charset="UTF-8">
     <title>@ViewData["Title"]</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .table thead th {
+            vertical-align: middle;
+            text-align: center;
+        }
+        .table td, .table th {
+            vertical-align: middle;
+        }
+        .btn-group .btn {
+            min-width: 40px;
+        }
+        .modal-content {
+            border-radius: 1rem;
+        }
+        .card, .table, .modal-content {
+            transition: box-shadow 0.2s;
+        }
+        .card:hover, .table-hover tbody tr:hover, .modal-content:hover {
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        }
+    </style>
 </head>
 <body class="bg-light">
-    <div class="container py-5">
-
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="fw-bold text-primary">@ViewData["Title"]</h1>
+    <div class="bg-primary text-white rounded-3 p-4 mb-4 shadow">
+        <div class="container">
+            <h1 class="display-4 mb-0">@ViewData["Title"]</h1>
+            <p class="lead">Manage, create, and update news articles for FPT University</p>
         </div>
-
-
-        <div class="mb-4">
-            <button id="openCreateNewsModal" class="btn btn-success shadow-sm">➕ Create New Article</button>
+    </div>
+    <div class="container pb-5">
+        <div class="mb-4 text-center">
+            <button id="openCreateNewsModal" class="btn btn-success btn-lg shadow-sm">
+                <span class="me-2">➕</span> Create New Article
+            </button>
         </div>
-
-        <form method="get">
-            <input type="text" name="searchString" placeholder="Search articles..." value="@Request.Query["searchString"]" />
-            <button type="submit">Search</button>
+        <form method="get" class="input-group mb-4 w-50 mx-auto">
+            <input type="text" name="searchString" class="form-control" placeholder="Search articles..." value="@Model.SearchString" />
+            <button type="submit" class="btn btn-outline-primary">🔍 Search</button>
         </form>
-
-        <div class="table-responsive shadow-sm rounded bg-white p-3">
-            <table class="table table-hover align-middle">
-                <thead class="table-dark">
+        <div class="table-responsive shadow rounded bg-white p-3">
+            <table class="table table-hover table-striped align-middle mb-0">
+                <thead class="table-primary">
                     <tr>
                         <th>📜 Title</th>
                         <th>📰 Headline</th>
-                        <th style="width: 30%;">📖 Content</th> <!-- Thu nhỏ cột Content -->
-                        <th> Source</th>
+                        <th style="width: 30%;">📖 Content</th>
+                        <th>Source</th>
                         <th>Status</th>
-
                         <th class="text-center">⚡ Action</th>
                     </tr>
                 </thead>
@@ -50,8 +69,7 @@
                             <td>@item.NewsTitle</td>
                             <td>@item.Headline</td>
                             <td>
-                                <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 300px;"
-                                     title="@item.NewsContent">
+                                <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 300px;" title="@item.NewsContent">
                                     @item.NewsContent
                                 </div>
                             </td>
@@ -60,17 +78,12 @@
                                 <span class="badge bg-@((item.NewsStatus ?? false) ? "success" : "secondary")">
                                     @((item.NewsStatus ?? false) ? "Active" : "Inactive")
                                 </span>
-
                             </td>
-
                             <td class="text-center">
-                                <div class="d-flex justify-content-center gap-2">
-                                    <a asp-page="Details" asp-route-id="@item.NewsArticleId"
-                                       class="btn btn-sm btn-outline-primary">👁️ Details</a>
-                                    <a href="javascript:void(0);" class="btn btn-sm btn-warning edit-news-btn"
-                                       data-id="@item.NewsArticleId">✏️ Edit</a>
-                                    <a href="javascript:void(0);" class="btn btn-sm btn-danger delete-news-btn"
-                                       data-id="@item.NewsArticleId" data-title="@item.NewsTitle">🗑️ Delete</a>
+                                <div class="btn-group" role="group">
+                                    <a asp-page="Details" asp-route-id="@item.NewsArticleId" class="btn btn-sm btn-outline-primary" title="Details">👁️</a>
+                                    <a href="javascript:void(0);" class="btn btn-sm btn-outline-warning edit-news-btn" data-id="@item.NewsArticleId" title="Edit">✏️</a>
+                                    <a href="javascript:void(0);" class="btn btn-sm btn-outline-danger delete-news-btn" data-id="@item.NewsArticleId" data-title="@item.NewsTitle" title="Delete">🗑️</a>
                                 </div>
                             </td>
                         </tr>
@@ -78,10 +91,97 @@
                 </tbody>
             </table>
         </div>
+        
+        <!-- Pagination -->
+        @if (Model.TotalPages > 1)
+        {
+            <div class="d-flex justify-content-between align-items-center mt-4">
+                <div class="text-muted">
+                    Showing @(((Model.CurrentPage - 1) * Model.PageSize) + 1) to @Math.Min(Model.CurrentPage * Model.PageSize, Model.TotalItems) of @Model.TotalItems articles
+                </div>
+                <nav aria-label="News articles pagination">
+                    <ul class="pagination pagination-sm mb-0">
+                        @if (Model.HasPreviousPage)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" asp-page="./Index" asp-route-pageNumber="@(Model.CurrentPage - 1)" asp-route-searchString="@Model.SearchString">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="page-item disabled">
+                                <span class="page-link">&laquo;</span>
+                            </li>
+                        }
 
+                        @{
+                            var startPage = Math.Max(1, Model.CurrentPage - 2);
+                            var endPage = Math.Min(Model.TotalPages, Model.CurrentPage + 2);
+                        }
+
+                        @if (startPage > 1)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" asp-page="./Index" asp-route-pageNumber="1" asp-route-searchString="@Model.SearchString">1</a>
+                            </li>
+                            @if (startPage > 2)
+                            {
+                                <li class="page-item disabled">
+                                    <span class="page-link">...</span>
+                                </li>
+                            }
+                        }
+
+                        @for (int i = startPage; i <= endPage; i++)
+                        {
+                            if (i == Model.CurrentPage)
+                            {
+                                <li class="page-item active">
+                                    <span class="page-link">@i</span>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="page-item">
+                                    <a class="page-link" asp-page="./Index" asp-route-pageNumber="@i" asp-route-searchString="@Model.SearchString">@i</a>
+                                </li>
+                            }
+                        }
+
+                        @if (endPage < Model.TotalPages)
+                        {
+                            @if (endPage < Model.TotalPages - 1)
+                            {
+                                <li class="page-item disabled">
+                                    <span class="page-link">...</span>
+                                </li>
+                            }
+                            <li class="page-item">
+                                <a class="page-link" asp-page="./Index" asp-route-pageNumber="@Model.TotalPages" asp-route-searchString="@Model.SearchString">@Model.TotalPages</a>
+                            </li>
+                        }
+
+                        @if (Model.HasNextPage)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" asp-page="./Index" asp-route-pageNumber="@(Model.CurrentPage + 1)" asp-route-searchString="@Model.SearchString">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="page-item disabled">
+                                <span class="page-link">&raquo;</span>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+            </div>
+        }
     </div>
-
-
     <div class="modal fade" id="createNewsModal" tabindex="-1" aria-labelledby="createNewsModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -93,8 +193,6 @@
             </div>
         </div>
     </div>
-
-
     <div class="modal fade" id="editNewsModal" tabindex="-1" aria-labelledby="editNewsModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -106,8 +204,6 @@
             </div>
         </div>
     </div>
-
-
     <div class="modal fade" id="deleteNewsModal" tabindex="-1" aria-labelledby="deleteNewsModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -118,6 +214,7 @@
                 <div class="modal-body" id="deleteNewsModalContent">
                     <form id="deleteNewsForm" method="post">
                         @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" id="deleteNewsId" />
                         <p>⚠️ Are you sure you want to delete <strong id="deleteNewsTitle"></strong>?</p>
                     </form>
                 </div>
@@ -128,10 +225,10 @@
             </div>
         </div>
     </div>
-
+    <footer class="bg-white border-top mt-5 py-3 text-center text-muted">
+        &copy; @DateTime.Now.Year FPT University News Management
+    </footer>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-
     <script>
         document.getElementById('openCreateNewsModal').addEventListener('click', function () {
             fetch('/NewsArticles/CreatePartial')
@@ -140,13 +237,11 @@
                     document.getElementById('createNewsModalContent').innerHTML = html;
                     const createModal = new bootstrap.Modal(document.getElementById('createNewsModal'));
                     createModal.show();
-
                     document.getElementById('createNewsArticleForm').addEventListener('submit', function (e) {
                         e.preventDefault();
                         const form = this;
                         const formData = new URLSearchParams(new FormData(form)).toString();
                         const token = form.querySelector('input[name="__RequestVerificationToken"]').value;
-
                         fetch('/NewsArticles/CreatePartial', {
                             method: 'POST',
                             headers: {
@@ -160,13 +255,8 @@
                             .catch(() => alert('⚡ Có lỗi xảy ra khi gửi form.'));
                     });
                 });
-
-
         });
     </script>
-
-
-
     <script>
         document.addEventListener('click', function (e) {
             if (e.target && e.target.classList.contains('edit-news-btn')) {
@@ -177,14 +267,11 @@
                         document.getElementById('editNewsModalContent').innerHTML = html;
                         const modal = new bootstrap.Modal(document.getElementById('editNewsModal'));
                         modal.show();
-
-
                         document.getElementById('editNewsArticleForm').addEventListener('submit', function (e) {
                             e.preventDefault();
                             const form = this;
                             const formData = new URLSearchParams(new FormData(form)).toString();
                             const token = form.querySelector('input[name="__RequestVerificationToken"]').value;
-
                             fetch('/NewsArticles/EditPartial', {
                                 method: 'POST',
                                 headers: {
@@ -203,17 +290,15 @@
                     .catch(() => alert('⚡ Không thể tải dữ liệu chỉnh sửa.'));
             }
         });
-
     </script>
-
-
     <script>
-
+        let deleteNewsId = null;
         document.addEventListener('click', function (e) {
             if (e.target && e.target.classList.contains('delete-news-btn')) {
                 deleteNewsId = e.target.getAttribute('data-id');
                 const newsTitle = e.target.getAttribute('data-title');
                 document.getElementById('deleteNewsTitle').textContent = newsTitle;
+                document.getElementById('deleteNewsId').value = deleteNewsId;
                 new bootstrap.Modal(document.getElementById('deleteNewsModal')).show();
             }
         });
@@ -227,7 +312,7 @@
                 .then(response => response.redirected ? window.location.href = response.url : alert('❌ Delete failed.'));
         });
     </script>
+    <script src="~/js/microsoft/signalr/dist/browser/signalr.js"></script>
+    <script src="~/js/site.js"></script>
 </body>
-</html>
-<script src="~/js/microsoft/signalr/dist/browser/signalr.js"></script>
-<script src="~/js/site.js"></script>
+</html> 

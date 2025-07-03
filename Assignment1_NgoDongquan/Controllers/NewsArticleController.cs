@@ -5,14 +5,16 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
+using Microsoft.AspNetCore.Cors;
 
 namespace Assignment1_NgoDongquan.Controllers
 {
-    public class NewsArticleController : ODataController
+    [EnableCors("AllowAll")]
+    public class NewsArticlesController : ODataController
     {
         private readonly INewsArticleService _newsArticleService;
 
-        public NewsArticleController(INewsArticleService newsArticleService)
+        public NewsArticlesController(INewsArticleService newsArticleService)
         {
             _newsArticleService = newsArticleService;
         }
@@ -81,5 +83,7 @@ namespace Assignment1_NgoDongquan.Controllers
             var activeArticles = await _newsArticleService.GetActiveNewsForLecturerAsync();
             return Ok(activeArticles.AsQueryable());
         }
+
+
     }
 }

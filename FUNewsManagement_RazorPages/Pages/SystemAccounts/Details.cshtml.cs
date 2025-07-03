@@ -21,7 +21,7 @@ namespace FUNewsManagement_RazorPages.Pages.SystemAccounts
         public async Task<IActionResult> OnGetAsync(short id)
         {
 
-            var systemaccount = await _httpClient.GetFromJsonAsync<SystemAccount>($"https://localhost:7130/api/SystemAccount/{id}");
+            var systemaccount = await _httpClient.GetFromJsonAsync<SystemAccount>($"https://localhost:7130/odata/SystemAccounts/{id}");
             if (systemaccount == null)
             {
                 return NotFound();

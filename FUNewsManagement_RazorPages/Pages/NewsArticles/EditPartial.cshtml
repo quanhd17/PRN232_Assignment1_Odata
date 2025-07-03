@@ -4,83 +4,100 @@
     Layout = null;
 }
 
-<form id="editNewsArticleForm" method="post">
-    <input type="hidden" name="id" value="@Model.NewsArticle?.NewsArticleId" />
-    <input type="hidden" asp-for="NewsArticle.NewsArticleId" />
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<div class="card shadow-sm border-0">
+    <div class="card-body p-4">
+        <form id="editNewsArticleForm" method="post">
+            <input type="hidden" name="id" value="@Model.NewsArticle?.NewsArticleId" />
+            <input type="hidden" asp-for="NewsArticle.NewsArticleId" />
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small"></div>
 
-    <!-- News Title -->
-    <div class="mb-3">
-        <label asp-for="NewsArticle.NewsTitle" class="form-label">📝 News Title</label>
-        <input asp-for="NewsArticle.NewsTitle" class="form-control" required />
-        <span asp-validation-for="NewsArticle.NewsTitle" class="text-danger"></span>
-    </div>
-
-    <!-- Headline -->
-    <div class="mb-3">
-        <label asp-for="NewsArticle.Headline" class="form-label">📰 Headline</label>
-        <input asp-for="NewsArticle.Headline" class="form-control" required />
-        <span asp-validation-for="NewsArticle.Headline" class="text-danger"></span>
-    </div>
-
-    <!-- News Content -->
-    <div class="mb-3">
-        <label asp-for="NewsArticle.NewsContent" class="form-label">📄 Content</label>
-        <textarea asp-for="NewsArticle.NewsContent" class="form-control" required></textarea>
-        <span asp-validation-for="NewsArticle.NewsContent" class="text-danger"></span>
-    </div>
-
-    <!-- News Source -->
-    <div class="mb-3">
-        <label asp-for="NewsArticle.NewsSource" class="form-label">🔗 Source</label>
-        <input asp-for="NewsArticle.NewsSource" class="form-control" required />
-        <span asp-validation-for="NewsArticle.NewsSource" class="text-danger"></span>
-    </div>
-
-    <!-- Category -->
-    <div class="mb-3">
-        <label asp-for="NewsArticle.CategoryId" class="form-label">📂 Category</label>
-        <select asp-for="NewsArticle.CategoryId" class="form-control" asp-items="Model.Categories" required>
-            <option value="">-- Select Category --</option>
-        </select>
-        <span asp-validation-for="NewsArticle.CategoryId" class="text-danger"></span>
-    </div>
-
-    <!-- News Status -->
-    <div class="mb-3">
-        <label asp-for="NewsArticle.NewsStatus" class="form-label">📌 News Status</label>
-        <select asp-for="NewsArticle.NewsStatus" class="form-select" required>
-            <option value="true">✅ Active</option>
-            <option value="false">⛔ Inactive</option>
-        </select>
-        <span asp-validation-for="NewsArticle.NewsStatus" class="text-danger"></span>
-    </div>
-
-
-    <!-- Tags -->
-    <div class="form-group">
-        <label class="control-label">Tags</label>
-        <div>
-            @foreach (var tag in Model.Tags)
-            {
-                var isChecked = ((List<int>)Model.SelectedTagIds)?.Contains(Convert.ToInt32(tag.Value)) ?? false;
-                <div class="form-check">
-                    <input type="checkbox" name="SelectedTagIds" value="@tag.Value"
-                           class="form-check-input" id="tag_@tag.Value"
-                    @(isChecked ? "checked" : "") />
-                    <label class="form-check-label" for="tag_@tag.Value">@tag.Text</label>
+            <div class="row g-3">
+                <!-- News Title -->
+                <div class="col-12">
+                    <label asp-for="NewsArticle.NewsTitle" class="form-label fw-semibold">📝 News Title</label>
+                    <input asp-for="NewsArticle.NewsTitle" class="form-control" required />
+                    <span asp-validation-for="NewsArticle.NewsTitle" class="text-danger small"></span>
                 </div>
-            }
-        </div>
+
+                <!-- Headline -->
+                <div class="col-12">
+                    <label asp-for="NewsArticle.Headline" class="form-label fw-semibold">📰 Headline</label>
+                    <input asp-for="NewsArticle.Headline" class="form-control" required />
+                    <span asp-validation-for="NewsArticle.Headline" class="text-danger small"></span>
+                </div>
+
+                <!-- News Content -->
+                <div class="col-12">
+                    <label asp-for="NewsArticle.NewsContent" class="form-label fw-semibold">📄 Content</label>
+                    <textarea asp-for="NewsArticle.NewsContent" class="form-control" rows="4" required></textarea>
+                    <span asp-validation-for="NewsArticle.NewsContent" class="text-danger small"></span>
+                </div>
+
+                <!-- News Source -->
+                <div class="col-md-6">
+                    <label asp-for="NewsArticle.NewsSource" class="form-label fw-semibold">🔗 Source</label>
+                    <input asp-for="NewsArticle.NewsSource" class="form-control" required />
+                    <span asp-validation-for="NewsArticle.NewsSource" class="text-danger small"></span>
+                </div>
+
+                <!-- Category -->
+                <div class="col-md-6">
+                    <label asp-for="NewsArticle.CategoryId" class="form-label fw-semibold">📂 Category</label>
+                    <select asp-for="NewsArticle.CategoryId" class="form-select" asp-items="Model.Categories" required>
+                        <option value="">-- Select Category --</option>
+                    </select>
+                    <span asp-validation-for="NewsArticle.CategoryId" class="text-danger small"></span>
+                </div>
+
+                <!-- News Status -->
+                <div class="col-md-6">
+                    <label asp-for="NewsArticle.NewsStatus" class="form-label fw-semibold">📌 News Status</label>
+                    <select asp-for="NewsArticle.NewsStatus" class="form-select" required>
+                        <option value="true">✅ Active</option>
+                        <option value="false">⛔ Inactive</option>
+                    </select>
+                    <span asp-validation-for="NewsArticle.NewsStatus" class="text-danger small"></span>
+                </div>
+
+                <!-- Tags -->
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">🏷️ Tags</label>
+                    <div class="d-flex flex-wrap gap-2">
+                        @foreach (var tag in Model.Tags)
+                        {
+                            var isChecked = ((List<int>)Model.SelectedTagIds)?.Contains(Convert.ToInt32(tag.Value)) ?? false;
+                            <div class="form-check">
+                                <input type="checkbox" name="SelectedTagIds" value="@tag.Value"
+                                       class="form-check-input" id="tag_@tag.Value"
+                                @(isChecked ? "checked" : "") />
+                                <label class="form-check-label" for="tag_@tag.Value">@tag.Text</label>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="modal-footer px-0 mt-4">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">❌ Cancel</button>
+                <button type="submit" class="btn btn-primary">✅ Update</button>
+            </div>
+        </form>
     </div>
+</div>
 
+<style>
+    .card {
+        border-radius: 1rem;
+    }
 
+    .form-control:focus, .form-select:focus {
+        box-shadow: 0 0 0 0.2rem rgba(13,110,253,.15);
+        border-color: #86b7fe;
+    }
 
-    <!-- Submit Button -->
-    <div class="modal-footer">
-
-
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">❌ Cancel</button>
-        <button type="submit" class="btn btn-primary">✅ Update</button>
-    </div>
-</form>
+    .form-check-input:focus {
+        box-shadow: 0 0 0 0.15rem rgba(13,110,253,.15);
+        border-color: #86b7fe;
+    }
+</style> 

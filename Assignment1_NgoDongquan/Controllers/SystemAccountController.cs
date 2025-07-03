@@ -1,104 +1,111 @@
 ﻿using BusinessLogic.Service;
 using BusinessObject.Dto;
 using BusinessObject.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Query;
+using Microsoft.AspNetCore.OData.Routing.Controllers;
 
 namespace Assignment1_NgoDongquan.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class SystemAccountController : ControllerBase
+    public class SystemAccountsController : ODataController
     {
         private readonly ISystemAccountService _systemAccountService;
-        public SystemAccountController(ISystemAccountService systemAccountService)
+
+        public SystemAccountsController(ISystemAccountService systemAccountService)
         {
             _systemAccountService = systemAccountService;
         }
 
-        [HttpGet]
+        // GET: odata/SystemAccounts
         [EnableQuery]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> Get()
         {
             var accounts = await _systemAccountService.GetAllSystemAccountsAsync();
-            return Ok(accounts);
+            return Ok(accounts.AsQueryable());
         }
 
-        [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginDto loginModel)
+        // GET: odata/SystemAccounts(1)
+        [EnableQuery]
+        public async Task<IActionResult> Get([FromODataUri] short key)
         {
-            var user = await _systemAccountService.Login(loginModel.AccountEmail, loginModel.AccountPassword);
-            return user == null ? Unauthorized() : Ok(user);
-        }
-
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(short id)
-        {
-            var account = await _systemAccountService.GetSystemAccountByIdAsync(id);
+            var account = await _systemAccountService.GetSystemAccountByIdAsync(key);
             return account == null ? NotFound() : Ok(account);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Create([FromBody] SystemAccount systemAccount)
+        // POST: odata/SystemAccounts
+        public async Task<IActionResult> Post([FromBody] SystemAccount systemAccount)
         {
             if (systemAccount == null)
-            {
                 return BadRequest("System account cannot be null.");
-            }
 
             await _systemAccountService.AddSystemAccountAsync(systemAccount);
-            return CreatedAtAction(nameof(GetById), new { id = systemAccount.AccountId }, systemAccount);
+            return Created(systemAccount);
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Update(short id, [FromBody] SystemAccount systemAccount)
+        // PUT: odata/SystemAccounts(1)
+        public async Task<IActionResult> Put([FromODataUri] short key, [FromBody] SystemAccount systemAccount)
         {
-            if (systemAccount == null || systemAccount.AccountId != id)
-            {
-                return BadRequest("System account is invalid.");
-            }
+            if (systemAccount == null || systemAccount.AccountId != key)
+                return BadRequest("Mismatched account ID.");
 
-            var existingAccount = await _systemAccountService.GetSystemAccountByIdAsync(id);
-            if (existingAccount == null)
-            {
+            var existing = await _systemAccountService.GetSystemAccountByIdAsync(key);
+            if (existing == null)
                 return NotFound();
-            }
-            
-            existingAccount.AccountName = systemAccount.AccountName;
-            existingAccount.AccountEmail = systemAccount.AccountEmail;
-            existingAccount.AccountRole = systemAccount.AccountRole;
-            existingAccount.AccountPassword = systemAccount.AccountPassword;
-            existingAccount.IsActive = systemAccount.IsActive;
 
-            await _systemAccountService.UpdateSystemAccountAsync(existingAccount);
+            existing.AccountName = systemAccount.AccountName;
+            existing.AccountEmail = systemAccount.AccountEmail;
+            existing.AccountRole = systemAccount.AccountRole;
+            existing.AccountPassword = systemAccount.AccountPassword;
+            existing.IsActive = systemAccount.IsActive;
+
+            await _systemAccountService.UpdateSystemAccountAsync(existing);
             return NoContent();
         }
 
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(short id)
+        // DELETE: odata/SystemAccounts(1)
+        public async Task<IActionResult> Delete([FromODataUri] short key)
         {
-            var existingAccount = await _systemAccountService.GetSystemAccountByIdAsync(id);
-            if (existingAccount == null)
-            {
-                return NotFound("Account not found");
-            }
+            var existing = await _systemAccountService.GetSystemAccountByIdAsync(key);
+            if (existing == null)
+                return NotFound();
 
-            await _systemAccountService.DeleteSystemAccountAsync(id);
+            await _systemAccountService.DeleteSystemAccountAsync(key);
             return NoContent();
         }
 
-        [HttpPost("Any")]
+        // POST: odata/SystemAccounts/Default.Login
+        [HttpPost("odata/SystemAccounts/Default.Login")]
+        public async Task<IActionResult> Login([FromBody] LoginDto loginModel)
+        {
+            var (user, token) = await _systemAccountService.Login(loginModel.AccountEmail, loginModel.AccountPassword);
+
+            if (user == null || string.IsNullOrEmpty(token))
+            {
+                return Unauthorized("Invalid email or password.");
+            }
+
+            return Ok(new
+            {
+                AccountId = user.AccountId,
+                AccountName = user.AccountName,
+                AccountEmail = user.AccountEmail,
+                AccountRole = user.AccountRole,
+                IsActive = user.IsActive,
+                Token = token
+            });
+        }
+
+
+        // POST: odata/SystemAccounts/Default.Any
+        [HttpPost("odata/SystemAccounts/Default.Any")]
         public async Task<IActionResult> Any([FromBody] SystemAccount systemAccount)
         {
             if (systemAccount == null)
-            {
                 return BadRequest("System account cannot be null.");
-            }
 
-            var existingAccount = await _systemAccountService.GetSystemAccountByIdAsync(systemAccount.AccountId);
-            return existingAccount == null ? NotFound() : Ok(existingAccount);
+            var existing = await _systemAccountService.GetSystemAccountByIdAsync(systemAccount.AccountId);
+            return existing == null ? NotFound() : Ok(existing);
         }
     }
 }

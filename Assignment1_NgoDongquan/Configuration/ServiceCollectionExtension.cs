@@ -20,6 +20,7 @@ namespace Assignment1_NgoDongquan.Configuration
             services.AddScoped<ITagService, TagService>();
             services.AddScoped<INewsArticleService, NewsArticleService>();
             services.AddScoped<ISystemAccountService, SystemAccountService>();
+            services.AddScoped<ICommentService, CommentService>();
         }
     }
 }

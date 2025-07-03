@@ -15,7 +15,7 @@ namespace FUNewsManagement_RazorPages.Pages.SystemAccounts
         }
         public async Task<IActionResult> OnPostAsync(short id)
         {
-            var response = await _httpClient.DeleteAsync($"https://localhost:7130/api/SystemAccount/{id}");
+            var response = await _httpClient.DeleteAsync($"https://localhost:7130/odata/SystemAccounts/{id}");
             if (response.IsSuccessStatusCode)
             {
                 return RedirectToPage("/SystemAccounts/Index");

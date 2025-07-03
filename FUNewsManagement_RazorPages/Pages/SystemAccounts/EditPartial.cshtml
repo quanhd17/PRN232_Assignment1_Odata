@@ -8,7 +8,6 @@
 <form id="editAccountForm" method="post">
     @Html.AntiForgeryToken()
     <input type="hidden" asp-for="SystemAccount.AccountId" />
-    <input type="hidden" asp-for="SystemAccount.AccountPassword" />
 
     <div class="mb-3">
         <label asp-for="SystemAccount.AccountName" class="form-label">👤 Account Name</label>
@@ -27,6 +26,11 @@
             <option value="2">Lecturer</option>
         </select>
         <span asp-validation-for="SystemAccount.AccountRole" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="SystemAccount.AccountPassword" class="form-label">🔐 Password</label>
+        <input asp-for="SystemAccount.AccountPassword" class="form-control" type="password" required />
+        <span asp-validation-for="SystemAccount.AccountPassword" class="text-danger"></span>
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">❌ Cancel</button>
