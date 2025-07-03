@@ -24,7 +24,7 @@ namespace FUNewsManagement_RazorPages.Pages.SystemAccounts
 
         public async Task<IActionResult> OnPostAsync()
         {
-            var existingAccounts = await _httpClient.PostAsJsonAsync("https://localhost:7130/api/SystemAccount/Any", SystemAccount);
+            var existingAccounts = await _httpClient.PostAsJsonAsync("https://localhost:7130/odata/SystemAccounts/Default.Any", SystemAccount);
 
             if (existingAccounts.IsSuccessStatusCode)
             {
@@ -32,7 +32,7 @@ namespace FUNewsManagement_RazorPages.Pages.SystemAccounts
                 return RedirectToPage("./Index");
             }
 
-            await _httpClient.PostAsJsonAsync("https://localhost:7130/api/SystemAccount", SystemAccount);
+            await _httpClient.PostAsJsonAsync("https://localhost:7130/odata/SystemAccounts", SystemAccount);
             return RedirectToPage("./Index");
         }
     }

@@ -1,5 +1,7 @@
-﻿using System.Security.Claims;
+﻿using System.Data;
+using System.Security.Claims;
 using FUNewsManagement_RazorPages.Models;
+using FUNewsManagement_RazorPages.Models.Dto;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -47,26 +49,27 @@ namespace FUNewsManagement_RazorPages.Pages.SystemAccounts
                 AccountEmail = Input.Email,
                 AccountPassword = Input.Password
             };
-            var response = await _httpClient.PostAsJsonAsync("https://localhost:7130/api/SystemAccount/login", loginModel);
+
+            var response = await _httpClient.PostAsJsonAsync("https://localhost:7130/odata/SystemAccounts/Default.Login", loginModel);
 
             if (response.IsSuccessStatusCode)
             {
-                // Deserialize user data from response
-                var user = await response.Content.ReadFromJsonAsync<SystemAccount>();
+                var loginResponse = await response.Content.ReadFromJsonAsync<LoginDto>();
 
-                var role = user.AccountRole switch
+                var role = loginResponse.AccountRole switch
                 {
                     1 => "Staff",
                     2 => "Lecturer",
+                    0 => "Admin",
                     _ => "Lecturer"
                 };
 
                 var claims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.NameIdentifier, user.AccountId.ToString()),
-                    new Claim(ClaimTypes.Name, user.AccountName ?? ""),
-                    new Claim(ClaimTypes.Email, user.AccountEmail ?? ""),
-                    new Claim(ClaimTypes.Role, role)
+                    new Claim(ClaimTypes.Name, loginResponse.AccountName),
+                    new Claim(ClaimTypes.Email, Input.Email),
+                    new Claim(ClaimTypes.Role, role),
+                    new Claim("AccessToken", loginResponse.Token)
                 };
 
                 var identity = new ClaimsIdentity(claims, "MyCookieAuth");
@@ -77,7 +80,8 @@ namespace FUNewsManagement_RazorPages.Pages.SystemAccounts
                 return role switch
                 {
                     "Staff" => RedirectToPage("/NewsArticles/Index"),
-                    "Lecturer" => RedirectToPage("/NewsArticles/LecturerNews"),
+                    "Lecturer" => RedirectToPage("/LecturerView/LecturerNews"),
+                    "Admin" => RedirectToPage("/SystemAccounts/Index"),
                     _ => RedirectToPage("/NewsArticles/LecturerNews")
                 };
             }

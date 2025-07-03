@@ -4,9 +4,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
+using Microsoft.AspNetCore.Cors;
 
 namespace Assignment1_NgoDongquan.Controllers
 {
+    [EnableCors("AllowAll")]
     public class CategoriesController : ODataController
     {
         private readonly ICategoryService _categoryService;

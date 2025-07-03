@@ -1,0 +1,328 @@
+@page
+@model ReportsModel
+@{
+    ViewData["Title"] = "Reports & Statistics";
+}
+
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">
+                <i class="fas fa-chart-bar me-2 text-primary"></i>
+                Reports & Statistics
+            </h1>
+            <p class="text-muted mb-0">Overview of FUNews Management System</p>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-primary" onclick="refreshStats()">
+                <i class="fas fa-sync-alt me-2"></i>
+                Refresh
+            </button>
+         
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row g-4 mb-4">
+        <!-- Total News Articles -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-primary bg-opacity-10 rounded-circle p-3">
+                                <i class="fas fa-newspaper text-primary fa-2x"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="card-title text-muted mb-1">Total News Articles</h6>
+                            <h3 class="mb-0 fw-bold" id="totalArticles">@Model.TotalArticles</h3>
+                            <small class="text-success">
+                                <i class="fas fa-arrow-up me-1"></i>
+                                @Model.PublishedArticles published
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Categories -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-success bg-opacity-10 rounded-circle p-3">
+                                <i class="fas fa-sitemap text-success fa-2x"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="card-title text-muted mb-1">Total Categories</h6>
+                            <h3 class="mb-0 fw-bold" id="totalCategories">@Model.TotalCategories</h3>
+                            <small class="text-info">
+                                <i class="fas fa-folder me-1"></i>
+                                @Model.ParentCategories parent categories
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Users -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-warning bg-opacity-10 rounded-circle p-3">
+                                <i class="fas fa-users text-warning fa-2x"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="card-title text-muted mb-1">Total Users</h6>
+                            <h3 class="mb-0 fw-bold" id="totalUsers">@Model.TotalUsers</h3>
+                            <small class="text-warning">
+                                <i class="fas fa-user-shield me-1"></i>
+                                @Model.ActiveUsers active
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Comments -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-info bg-opacity-10 rounded-circle p-3">
+                                <i class="fas fa-comments text-info fa-2x"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="card-title text-muted mb-1">Total Comments</h6>
+                            <h3 class="mb-0 fw-bold" id="totalComments">@Model.TotalComments</h3>
+                            <small class="text-info">
+                                <i class="fas fa-clock me-1"></i>
+                                Last 30 days
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts and Tables Row -->
+    <div class="row g-4">
+        <!-- News Articles by Category -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent border-0">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-pie me-2 text-primary"></i>
+                        News Articles by Category
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Category</th>
+                                    <th>Articles</th>
+                                    <th>Percentage</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="categoryStats">
+                                @foreach (var category in Model.CategoryStats)
+                                {
+                                    var percentage = Model.TotalArticles > 0 ? (category.ArticleCount * 100.0 / Model.TotalArticles) : 0;
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-folder text-warning me-2"></i>
+                                                @category.CategoryName
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-primary">@category.ArticleCount</span>
+                                        </td>
+                                        <td>
+                                            <div class="progress" style="height: 6px;">
+                                                <div class="progress-bar bg-primary" style="width: @percentage%"></div>
+                                            </div>
+                                            <small class="text-muted">@percentage.ToString("F1")%</small>
+                                        </td>
+                                        <td>
+                                            @if (category.ArticleCount > 0)
+                                            {
+                                                <span class="badge bg-success">Active</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary">Empty</span>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent border-0">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-clock me-2 text-success"></i>
+                        Recent Activity
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="timeline" id="recentActivity">
+                        @foreach (var activity in Model.RecentActivities)
+                        {
+                            <div class="timeline-item">
+                                <div class="timeline-marker bg-primary"></div>
+                                <div class="timeline-content">
+                                    <h6 class="mb-1">@activity.Title</h6>
+                                    <p class="text-muted mb-1">@activity.Description</p>
+                                    <small class="text-muted">
+                                        <i class="fas fa-calendar me-1"></i>
+                                        @activity.Date.ToString("MMM dd, yyyy HH:mm")
+                                    </small>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Statistics -->
+    <div class="row g-4 mt-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent border-0">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-user-chart me-2 text-warning"></i>
+                        User Statistics
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-4">
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                    <i class="fas fa-user-shield text-primary fa-2x"></i>
+                                </div>
+                                <h4 class="fw-bold">@Model.AdminUsers</h4>
+                                <p class="text-muted mb-0">Administrators</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                    <i class="fas fa-user-edit text-success fa-2x"></i>
+                                </div>
+                                <h4 class="fw-bold">@Model.StaffUsers</h4>
+                                <p class="text-muted mb-0">Staff Members</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <div class="bg-info bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                    <i class="fas fa-chalkboard-teacher text-info fa-2x"></i>
+                                </div>
+                                <h4 class="fw-bold">@Model.LecturerUsers</h4>
+                                <p class="text-muted mb-0">Lecturers</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <div class="bg-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                    <i class="fas fa-user-clock text-warning fa-2x"></i>
+                                </div>
+                                <h4 class="fw-bold">@Model.InactiveUsers</h4>
+                                <p class="text-muted mb-0">Inactive Users</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .timeline {
+        position: relative;
+        padding-left: 30px;
+    }
+    
+    .timeline-item {
+        position: relative;
+        margin-bottom: 20px;
+    }
+    
+    .timeline-marker {
+        position: absolute;
+        left: -35px;
+        top: 5px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+    }
+    
+    .timeline-item:not(:last-child)::before {
+        content: '';
+        position: absolute;
+        left: -29px;
+        top: 17px;
+        width: 2px;
+        height: calc(100% + 3px);
+        background-color: #dee2e6;
+    }
+    
+    .timeline-content {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        border-left: 3px solid #007bff;
+    }
+    
+    .card {
+        transition: transform 0.2s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+    }
+    
+    .progress {
+        background-color: #e9ecef;
+    }
+</style>
+
+<script>
+    // Refresh statistics
+    function refreshStats() {
+        location.reload();
+    }
+    
+    // Auto-refresh every 5 minutes
+    setInterval(function() {
+        console.log('Auto-refresh triggered');
+    }, 300000);
+</script> 

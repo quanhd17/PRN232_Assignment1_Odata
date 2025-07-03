@@ -25,15 +25,27 @@ builder.Services.AddControllers()
 static IEdmModel GetEdmModel()
 {
     var edmBuilder = new ODataConventionModelBuilder();
+    edmBuilder.EntitySet<NewsArticle>("NewsArticles");
     edmBuilder.EntityType<NewsArticle>()
     .Collection
     .Function("GetActiveNews")
     .ReturnsCollectionFromEntitySet<NewsArticle>("NewsArticle");
+    edmBuilder.EntitySet<Category>("Categories");
     edmBuilder.EntityType<Category>()
     .Collection
     .Function("Active")
     .ReturnsCollectionFromEntitySet<Category>("Categories");
     edmBuilder.EntitySet<Tag>("Tags");
+    edmBuilder.EntitySet<Comment>("Comments");
+    edmBuilder.EntityType<Comment>()
+    .Collection
+    .Function("GetByArticleId")
+    .ReturnsCollectionFromEntitySet<Comment>("Comments")
+    .Parameter<int>("articleId");
+    edmBuilder.EntityType<SystemAccount>()
+        .Collection
+        .Function("Any")
+        .ReturnsFromEntitySet<SystemAccount>("SystemAccounts");
     return edmBuilder.GetEdmModel();
 }
 
@@ -50,8 +62,16 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("https://localhost:5001")
+        policy.WithOrigins("https://localhost:5001", "https://localhost:7209", "http://localhost:7209")
               .AllowCredentials()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+    
+    // More permissive policy for development
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
               .AllowAnyMethod()
               .AllowAnyHeader();
     });
@@ -86,6 +106,16 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseRouting();
+
+// Use more permissive CORS policy for development
+if (app.Environment.IsDevelopment())
+{
+    app.UseCors("AllowAll");
+}
+else
+{
+    app.UseCors("AllowFrontend");
+}
 
 app.UseAuthentication();
 app.UseAuthorization();

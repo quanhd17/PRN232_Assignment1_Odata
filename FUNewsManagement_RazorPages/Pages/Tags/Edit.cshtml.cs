@@ -1,5 +1,6 @@
 
 using FUNewsManagement_RazorPages.Models;
+using FUNewsManagement_RazorPages.Models.Dto;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -34,23 +35,35 @@ namespace FUNewsManagement_RazorPages.Pages.Tags
             return Page();
         }
 
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more information, see https://aka.ms/RazorPagesCRUD.
         public async Task<IActionResult> OnPostAsync()
         {
+            Console.WriteLine($"Sending TagId: {Tag.TagId}, TagName: {Tag.TagName}, Note: {Tag.Note}");
+
             if (ModelState.IsValid)
             {
                 var url = $"https://localhost:7130/odata/Tags({Tag.TagId})";
-                var response = await _httpClient.PutAsJsonAsync(url, Tag);
+
+                var tagDto = new TagDto
+                {
+                    TagId = Tag.TagId,
+                    TagName = Tag.TagName,
+                    Note = Tag.Note
+                };
+
+                var response = await _httpClient.PutAsJsonAsync(url, tagDto);
 
                 if (response.IsSuccessStatusCode)
                 {
                     return RedirectToPage("./Index");
                 }
-                ModelState.AddModelError(string.Empty, "Cannot update tag.");
+
+                var errorContent = await response.Content.ReadAsStringAsync();
+                ModelState.AddModelError(string.Empty, $"Cannot update tag. Server said: {errorContent}");
             }
 
             return Page();
         }
+
+
     }
 }

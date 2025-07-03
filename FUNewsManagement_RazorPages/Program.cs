@@ -17,6 +17,7 @@ builder.Services.AddControllers()
     {
         options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
         options.JsonSerializerOptions.WriteIndented = true;
+        options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
     })
     .AddOData(opt =>
     {
@@ -32,6 +33,10 @@ static IEdmModel GetEdmModel()
      .ReturnsCollectionFromEntitySet<NewsArticle>("NewsArticle");
     edmBuilder.EntitySet<Category>("Categories");
     edmBuilder.EntitySet<Tag>("Tags");
+    edmBuilder.EntityType<SystemAccount>()
+        .Collection
+        .Function("Any")
+        .ReturnsFromEntitySet<SystemAccount>("SystemAccounts");
     return edmBuilder.GetEdmModel();
 }
 

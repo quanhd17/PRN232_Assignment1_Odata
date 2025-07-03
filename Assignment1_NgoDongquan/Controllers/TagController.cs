@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Microsoft.AspNetCore.OData.Formatter;
+using BusinessObject.Dto;
 
 namespace Assignment1_NgoDongquan.Controllers
 {
@@ -34,10 +35,16 @@ namespace Assignment1_NgoDongquan.Controllers
         }
 
         // POST: odata/Tags
-        public async Task<IActionResult> Post([FromBody] Tag tag)
+        public async Task<IActionResult> Post([FromBody] TagDto tagDto)
         {
-            if (tag == null)
+            if (tagDto == null)
                 return BadRequest("Tag cannot be null.");
+
+            var tag = new Tag
+            {
+                TagName = tagDto.TagName,
+                Note = tagDto.Note
+            };
 
             await _tagService.AddTagAsync(tag);
             return Created(tag);

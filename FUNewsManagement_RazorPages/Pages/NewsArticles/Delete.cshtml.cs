@@ -11,10 +11,14 @@ namespace FUNewsManagement_RazorPages.Pages.NewsArticles
             _httpClient = httpClient;
         }
 
-        public async Task<IActionResult> OnPostAsync(int id)
+        [BindProperty(SupportsGet = true)]
+        public int Id { get; set; }
+
+        public async Task<IActionResult> OnPostAsync()
         {
-            await _httpClient.DeleteAsync($"https://localhost:7130/odata/NewsArticles({id})");
+            await _httpClient.DeleteAsync($"https://localhost:7130/odata/NewsArticles({Id})");
             return RedirectToPage("/NewsArticles/Index");
         }
     }
+
 }

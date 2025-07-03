@@ -1,4 +1,6 @@
+
 using FUNewsManagement_RazorPages.Models;
+using FUNewsManagement_RazorPages.Models.Dto;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -32,15 +34,15 @@ namespace FUNewsManagement_RazorPages.Pages.NewsArticles
             var response = await _httpClient.GetFromJsonAsync<ODataResponse<Category>>("https://localhost:7130/odata/Categories/Default.Active()");
             CategoryList = new SelectList(response?.Value ?? new List<Category>(), "CategoryId", "CategoryName");
 
-            var tagResponse = await _httpClient.GetFromJsonAsync<ODataResponse<Tag>>("https://localhost:7130/odata/Tags");
-            TagList = new MultiSelectList(tagResponse?.Value ?? new List<Tag>(), "TagId", "TagName");
-
+            var tagResponse = await _httpClient.GetFromJsonAsync<ODataResponse<Tag>>("https://localhost:7130/odata/Tags");        
+            TagList = new MultiSelectList(tagResponse?.Value ?? new List<Tag>(), "TagId", "TagName");          
 
             return Page();
         }
 
         public async Task<IActionResult> OnPostAsync()
         {
+
             var userIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (!string.IsNullOrEmpty(userIdValue) && short.TryParse(userIdValue, out short staffId))
             {
@@ -51,7 +53,7 @@ namespace FUNewsManagement_RazorPages.Pages.NewsArticles
             NewsArticle.CreatedDate = DateTime.Now;
             NewsArticle.ModifiedDate = DateTime.Now;
 
-            var model = new
+            var model = new NewArticleDto
             {
                 NewsArticle = NewsArticle,
                 TagIds = TagIds
@@ -59,7 +61,5 @@ namespace FUNewsManagement_RazorPages.Pages.NewsArticles
             await _httpClient.PostAsJsonAsync("https://localhost:7130/odata/NewsArticles", model);
             return RedirectToPage("/NewsArticles/Index");
         }
-
-
     }
 }

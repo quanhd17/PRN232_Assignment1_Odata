@@ -20,7 +20,7 @@ namespace FUNewsManagement_RazorPages.Pages.SystemAccounts
         public async Task<IActionResult> OnGetAsync(short id)
         {
 
-            var systemaccount = await _httpClient.GetFromJsonAsync<SystemAccount>($"https://localhost:7130/api/SystemAccount/{id}");
+            var systemaccount = await _httpClient.GetFromJsonAsync<SystemAccount>($"https://localhost:7130/odata/SystemAccounts/{id}");
             if (systemaccount == null)
             {
                 return NotFound();
@@ -34,7 +34,7 @@ namespace FUNewsManagement_RazorPages.Pages.SystemAccounts
 
         public async Task<IActionResult> OnPostAsync()
         {
-                var response = await _httpClient.PutAsJsonAsync($"https://localhost:7130/api/SystemAccount/{SystemAccount.AccountId}", SystemAccount);
+                var response = await _httpClient.PutAsJsonAsync($"https://localhost:7130/odata/SystemAccounts/{SystemAccount.AccountId}", SystemAccount);
 
                 if (response.IsSuccessStatusCode)
                 {

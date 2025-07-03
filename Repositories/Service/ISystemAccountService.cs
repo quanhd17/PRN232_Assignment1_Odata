@@ -14,6 +14,6 @@ namespace BusinessLogic.Service
         Task AddSystemAccountAsync(SystemAccount systemAccount);
         Task UpdateSystemAccountAsync(SystemAccount systemAccount);
         Task DeleteSystemAccountAsync(short id);
-        Task<SystemAccount?> Login(string email, string password);
+        Task<(SystemAccount? user, string? token)> Login(string email, string password);
     }
 }

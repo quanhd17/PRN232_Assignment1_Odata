@@ -5,23 +5,22 @@
     ViewData["Title"] = "News Article Details";
 }
 
-<div class="container mt-4">
-    <h1 class="text-center">News Article Details</h1>
+<div class="container py-4">
+    <div class="bg-primary text-white rounded-3 p-4 mb-4 shadow text-center">
+        <h1 class="display-5 mb-0">News Article Details</h1>
+    </div>
 
-
-    <div class="card">
-        <div class="card-body">
-
-
-            <table class="table table-bordered table-striped">
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body p-4">
+            <table class="table table-bordered align-middle mb-0">
                 <tbody>
                     <tr>
-                        <th class="col-sm-2">@Html.DisplayNameFor(model => model.NewsArticle.NewsArticleId)</th>
+                        <th class="col-sm-3">@Html.DisplayNameFor(model => model.NewsArticle.NewsArticleId)</th>
                         <td>@Html.DisplayFor(model => model.NewsArticle.NewsArticleId)</td>
                     </tr>
                     <tr>
                         <th>@Html.DisplayNameFor(model => model.NewsArticle.NewsTitle)</th>
-                        <td>@Html.DisplayFor(model => model.NewsArticle.NewsTitle)</td>
+                        <td class="fw-semibold fs-5">@Html.DisplayFor(model => model.NewsArticle.NewsTitle)</td>
                     </tr>
                     <tr>
                         <th>@Html.DisplayNameFor(model => model.NewsArticle.Headline)</th>
@@ -33,17 +32,18 @@
                     </tr>
                     <tr>
                         <th>@Html.DisplayNameFor(model => model.NewsArticle.NewsContent)</th>
-                        <td>@Html.DisplayFor(model => model.NewsArticle.NewsContent)</td>
+                        <td style="white-space: pre-line;">@Html.DisplayFor(model => model.NewsArticle.NewsContent)</td>
                     </tr>
                     <tr>
                         <th>@Html.DisplayNameFor(model => model.NewsArticle.NewsSource)</th>
                         <td>@Html.DisplayFor(model => model.NewsArticle.NewsSource)</td>
                     </tr>
                     <tr>
-                        <
                         <th>@Html.DisplayNameFor(model => model.NewsArticle.NewsStatus)</th>
                         <td>
-                            @(Model.NewsArticle.NewsStatus.GetValueOrDefault() ? "Active" : "Inactive")
+                            <span class="badge bg-@(Model.NewsArticle.NewsStatus.GetValueOrDefault() ? "success" : "secondary")">
+                                @(Model.NewsArticle.NewsStatus.GetValueOrDefault() ? "Active" : "Inactive")
+                            </span>
                         </td>
                     </tr>
                     <tr>
@@ -67,28 +67,41 @@
                         <td>
                             @if (Model.NewsArticle.Tags != null && Model.NewsArticle.Tags.Any())
                             {
-                                <ul class="list-inline">
+                                <div class="d-flex flex-wrap gap-2">
                                     @foreach (var tag in Model.NewsArticle.Tags)
                                     {
-                                        <li class="list-inline-item badge bg-secondary">@tag.TagName</li>
+                                        <span class="badge bg-info text-dark">@tag.TagName</span>
                                     }
-                                </ul>
+                                </div>
                             }
                             else
                             {
-                                <p class="text-muted">No tags available.</p>
+                                <span class="text-muted">No tags available.</span>
                             }
                         </td>
                     </tr>
                 </tbody>
             </table>
-
         </div>
     </div>
 
     <!-- Action Buttons -->
     <div class="mt-4 text-center">
-
-        <a class="btn btn-secondary" asp-page="/NewsArticles/Index">Back to List</a>
+        <a class="btn btn-secondary btn-lg px-4" asp-page="/NewsArticles/Index">← Back to List</a>
     </div>
 </div>
+
+<style>
+    .card {
+        border-radius: 1rem;
+    }
+    .table th {
+        background: #f8f9fa;
+        width: 220px;
+    }
+    .badge {
+        font-size: 1em;
+        padding: 0.6em 1em;
+        border-radius: 0.7em;
+    }
+</style> 

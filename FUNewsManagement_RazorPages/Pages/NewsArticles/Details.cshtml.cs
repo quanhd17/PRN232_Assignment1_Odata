@@ -21,7 +21,8 @@ namespace FUNewsManagement_RazorPages.Pages.NewsArticles
 
         public async Task<IActionResult> OnGetAsync(string id)
         {
-            var article = await _httpClient.GetFromJsonAsync<NewsArticle>($"https://localhost:7130/odata/NewsArticle({id})");
+            var article = await _httpClient.GetFromJsonAsync<NewsArticle>($"https://localhost:7130/odata/NewsArticles({id})?$expand=Category,Tags");
+
             if (article == null)
             {
                 return NotFound();
@@ -29,7 +30,7 @@ namespace FUNewsManagement_RazorPages.Pages.NewsArticles
             else
             {
                 NewsArticle = article;
-                NewsArticle.Category = await _httpClient.GetFromJsonAsync<Category>($"https://localhost:7130/odata/Categories({id})");
+
                 if (NewsArticle.Tags != null && NewsArticle.Tags.Count > 0)
                 {
                     foreach (var tag in NewsArticle.Tags)

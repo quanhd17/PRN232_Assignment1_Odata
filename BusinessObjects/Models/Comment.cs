@@ -3,10 +3,10 @@ using System.Collections.Generic;
 
 namespace BusinessObject.Models;
 
-public partial class Comment
+public partial class Comment : IEntity<int>
 {
     public int CommentId { get; set; }
-
+    int IEntity<int>.Id => CommentId;
     public int NewsArticleId { get; set; }
 
     public short AccountId { get; set; }

@@ -12,32 +12,58 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewData["Title"]</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .card, .modal-content {
+            border-radius: 1rem;
+        }
+
+        .table th, .table td {
+            vertical-align: middle;
+        }
+
+        .table th {
+            background: #f8f9fa;
+        }
+
+        .badge {
+            font-size: 1em;
+            padding: 0.5em 1em;
+            border-radius: 0.7em;
+        }
+
+        .btn-group .btn {
+            min-width: 40px;
+        }
+
+        .table-hover tbody tr:hover, .card:hover, .modal-content:hover {
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            transition: 0.2s;
+        }
+    </style>
 </head>
 <body class="bg-light">
-
-    <div class="container py-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="fw-bold">@ViewData["Title"]</h1>
-        </div>
-
-
-
-
-
-        <div class="mb-3">
-            <button id="openCreateModal" class="btn btn-success">
-                ➕ Create New Account
+    <div class="bg-primary text-white rounded-3 p-4 mb-4 shadow text-center">
+        <h1 class="display-5 mb-0">@ViewData["Title"]</h1>
+        <p class="lead">Manage system accounts for staff and lecturers</p>
+    </div>
+    <div class="container pb-5">
+        <div class="mb-4 text-center">
+            <button id="openCreateModal" class="btn btn-success btn-lg shadow-sm">
+                <span class="me-2">➕</span> Create New Account
             </button>
         </div>
-
-        <div class="table-responsive shadow-sm rounded bg-white p-3">
-            <table class="table table-hover align-middle">
-                <thead class="table-dark">
+        <form method="get" class="input-group mb-4 w-50 mx-auto">
+            <input type="text" name="searchString" class="form-control" placeholder="Search accounts..." value="@Model.SearchString" />
+            <button type="submit" class="btn btn-outline-primary">🔍 Search</button>
+        </form>
+        <div class="table-responsive shadow rounded bg-white p-3">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-primary">
                     <tr>
-                        <th> Account Name</th>
-                        <th> Email</th>
-                        <th> Role</th>
-                        <th> Password</th>
+                        <th>Account Name</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Password</th>
                         <th class="text-center">⚡ Action</th>
                     </tr>
                 </thead>
@@ -54,21 +80,107 @@
                             </td>
                             <td>••••••••</td>
                             <td class="text-center">
-                                <a asp-page="Details" asp-route-id="@item.AccountId" class="btn btn-sm btn-outline-primary me-1">
-                                     View
-                                </a>
-                                <a href="javascript:void(0);" class="btn btn-sm btn-warning me-1 edit-account-btn" data-id="@item.AccountId">
-                                     Edit
-                                </a>
-                                <a href="javascript:void(0);" class="btn btn-sm btn-danger delete-account-btn" data-id="@item.AccountId" data-name="@item.AccountName">
-                                     Delete
-                                </a>
+                                <div class="btn-group" role="group">
+                                    <a asp-page="Details" asp-route-id="@item.AccountId" class="btn btn-sm btn-outline-primary" title="View">👁️</a>
+                                    <a href="javascript:void(0);" class="btn btn-sm btn-outline-warning edit-account-btn" data-id="@item.AccountId" title="Edit">✏️</a>
+                                    <a href="javascript:void(0);" class="btn btn-sm btn-outline-danger delete-account-btn" data-id="@item.AccountId" data-name="@item.AccountName" title="Delete">🗑️</a>
+                                </div>
                             </td>
                         </tr>
                     }
                 </tbody>
             </table>
         </div>
+        
+        <!-- Pagination -->
+        @if (Model.TotalPages > 1)
+        {
+            <div class="d-flex justify-content-between align-items-center mt-4">
+                <div class="text-muted">
+                    Showing @(((Model.CurrentPage - 1) * Model.PageSize) + 1) to @Math.Min(Model.CurrentPage * Model.PageSize, Model.TotalItems) of @Model.TotalItems accounts
+                </div>
+                <nav aria-label="System accounts pagination">
+                    <ul class="pagination pagination-sm mb-0">
+                        @if (Model.HasPreviousPage)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" asp-page="./Index" asp-route-pageNumber="@(Model.CurrentPage - 1)" asp-route-searchString="@Model.SearchString">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="page-item disabled">
+                                <span class="page-link">&laquo;</span>
+                            </li>
+                        }
+
+                        @{
+                            var startPage = Math.Max(1, Model.CurrentPage - 2);
+                            var endPage = Math.Min(Model.TotalPages, Model.CurrentPage + 2);
+                        }
+
+                        @if (startPage > 1)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" asp-page="./Index" asp-route-pageNumber="1" asp-route-searchString="@Model.SearchString">1</a>
+                            </li>
+                            @if (startPage > 2)
+                            {
+                                <li class="page-item disabled">
+                                    <span class="page-link">...</span>
+                                </li>
+                            }
+                        }
+
+                        @for (int i = startPage; i <= endPage; i++)
+                        {
+                            if (i == Model.CurrentPage)
+                            {
+                                <li class="page-item active">
+                                    <span class="page-link">@i</span>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="page-item">
+                                    <a class="page-link" asp-page="./Index" asp-route-pageNumber="@i" asp-route-searchString="@Model.SearchString">@i</a>
+                                </li>
+                            }
+                        }
+
+                        @if (endPage < Model.TotalPages)
+                        {
+                            @if (endPage < Model.TotalPages - 1)
+                            {
+                                <li class="page-item disabled">
+                                    <span class="page-link">...</span>
+                                </li>
+                            }
+                            <li class="page-item">
+                                <a class="page-link" asp-page="./Index" asp-route-pageNumber="@Model.TotalPages" asp-route-searchString="@Model.SearchString">@Model.TotalPages</a>
+                            </li>
+                        }
+
+                        @if (Model.HasNextPage)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" asp-page="./Index" asp-route-pageNumber="@(Model.CurrentPage + 1)" asp-route-searchString="@Model.SearchString">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="page-item disabled">
+                                <span class="page-link">&raquo;</span>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+            </div>
+        }
     </div>
 
     <!-- Modal Create Popup -->
@@ -121,7 +233,7 @@
 
     <!-- Create Account Script -->
     <script>
-               document.getElementById('openCreateModal').addEventListener('click', function () {
+        document.getElementById('openCreateModal').addEventListener('click', function () {
             fetch('/SystemAccounts/CreatePartial')
                 .then(response => response.text())
                 .then(html => {
@@ -145,14 +257,14 @@
                         })
                             .then(response => {
                                 if (response.redirected) {
-                                    window.location.href = response.url; // ✅ Reload lại trang nếu có redirect (lưu lỗi vào TempData)
+                                    window.location.href = response.url;
                                 } else {
                                     return response.text();
                                 }
                             })
                             .then(data => {
                                 if (data) {
-                                    document.getElementById('modalContent').innerHTML = data; // ❌ Nếu có lỗi, hiển thị lỗi ngay trong modal
+                                    document.getElementById('modalContent').innerHTML = data;
                                 }
                             })
                             .catch(() => alert('⚡ Có lỗi xảy ra khi gửi form.'));
@@ -166,8 +278,8 @@
         document.addEventListener('click', function (e) {
             if (e.target && e.target.classList.contains('edit-account-btn')) {
                 const accountId = e.target.getAttribute('data-id');
-        fetch(`/SystemAccounts/EditPartial?id=${accountId}`)
-                            .then(response => response.text())
+                fetch(`/SystemAccounts/EditPartial?id=${accountId}`)
+                    .then(response => response.text())
                     .then(html => {
                         document.getElementById('editModalContent').innerHTML = html;
                         const modal = new bootstrap.Modal(document.getElementById('editAccountModal'));
@@ -209,8 +321,7 @@
                 modal.show();
             }
         });
-
-                document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
+        document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
             const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
             fetch(`/SystemAccounts/Delete?id=${deleteAccountId}`, {
                 method: 'POST',
@@ -219,24 +330,18 @@
                 },
                 body: `__RequestVerificationToken=${token}`
             })
-            .then(async response => {
-                if (response.redirected) {
-                    window.location.href = response.url;
-                } else if (!response.ok) {
-                    // Đọc nội dung lỗi từ API
-                    const errorText = await response.text();
-                    // Hiển thị thông báo lỗi (có thể tuỳ chỉnh UI)
-                    alert(errorText || '❌ Xóa thất bại.');
-                } else {
-                    alert('❌ Xóa thất bại.');
-                }
-            })
-            .catch(() => alert('⚡ Có lỗi xảy ra khi xóa tài khoản.'));
+                .then(async response => {
+                    if (response.redirected) {
+                        window.location.href = response.url;
+                    } else if (!response.ok) {
+                        const errorText = await response.text();
+                        alert(errorText || '❌ Xóa thất bại.');
+                    } else {
+                        alert('❌ Xóa thất bại.');
+                    }
+                })
+                .catch(() => alert('⚡ Có lỗi xảy ra khi xóa tài khoản.'));
         });
-
-
-
     </script>
-
 </body>
-</html>
+</html> 
